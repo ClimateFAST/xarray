@@ -191,6 +191,17 @@ def _open_netcdf4_group(filename, mode, group=None, **kwargs):
 
     return ds
 
+def _netcdf4_group_from_memory(nc_bytes, mode, group=None, **kwargs):
+    import netCDF4 as nc4
+
+    ds = nc4.Dataset(filename, mode=mode, memory=nc_bytes, **kwargs)
+
+    with close_on_error(ds):
+        ds = _nc4_group(ds, group, mode)
+
+    _disable_mask_and_scale(ds)
+
+    return ds
 
 def _disable_mask_and_scale(ds):
     for var in ds.variables.values():

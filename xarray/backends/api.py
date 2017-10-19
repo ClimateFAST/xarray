@@ -262,7 +262,11 @@ def open_dataset(filename_or_obj, group=None, decode_cf=True,
 
         if (isinstance(filename_or_obj, bytes) and
                 filename_or_obj.startswith(b'\x89HDF')):
-            raise ValueError('cannot read netCDF4/HDF5 file images')
+            opener = functools.partial(_netcdf4_group_from_memory, filename_or_obj, mode='r',
+                                   group=group, clobber=True,
+                                   diskless=True, persist=False,
+                                   format='NETCDF4')
+            store = backends.NetCDF4DataStore.open('in-memory-file.nc', opener=opener, group=group, autoclose=autoclose)
         elif (isinstance(filename_or_obj, bytes) and
                 filename_or_obj.startswith(b'CDF')):
             # netCDF3 file images are handled by scipy
